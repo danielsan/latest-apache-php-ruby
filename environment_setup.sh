@@ -1,3 +1,4 @@
+#!/bin/bash
 args=$@
 
 if [[ " ${args[*]} " == *" --libs "* ]] ||
