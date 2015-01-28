@@ -268,3 +268,19 @@ exit
   fi
 fi
 
+
+if [[ " ${args[*]} " == *" --php-install "* ]]      || \
+   [[ " ${args[*]} " == *" --php-libs "* ]] || \
+   [[ " ${args[*]} " == *" --php-memcache "* ]]; then
+
+  sudo /opt/php-5.6/bin/pecl install Memcache
+  echo '[memcache]
+  extension=memcache.so
+  memcache.dbpath="/var/lib/memcache"
+  memcache.maxreclevel=0
+  memcache.maxfiles=0
+  memcache.archivememlim=0
+  memcache.maxfilesize=0
+  memcache.maxratio=0
+  ' | sudo tee -a /opt/php-5.6/lib/php.ini
+fi
