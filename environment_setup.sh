@@ -335,3 +335,7 @@ if [[ " ${args[*]} " == *" --redis "* ]]; then
   sudo aptitude install -y redis-server
 fi
 
+if [[ " ${args[*]} " == *" --memcache "* ]] || [[ " ${args[*]} " == *" --memcached "* ]]; then
+  # Redis last version
+  sudo aptitude install -y memcached
+fi
