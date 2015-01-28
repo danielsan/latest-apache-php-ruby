@@ -356,7 +356,7 @@ if [[ " ${args[*]} " == *" --rbenv "* ]]; then
 fi
 
 
-if [[ " ${args[*]} " == *" --ruby "* ]]; then
+if [[ " ${args[*]} " == *" --ruby-install "* ]]; then
   #try
   export RUBY_VERSION=$(rbenv install -list | grep -Po '^\s*2.+' | tail -1)
   rbenv install $RUBY_VERSION
@@ -369,14 +369,14 @@ fi
 #   make: *** [build-ext] Error 2
 #
 # Try this out:
-if [[ " ${args[*]} " == *" --alt-ruby "* ]]; then
+if [[ " ${args[*]} " == *" --alt-ruby-install "* ]]; then
   export RUBY_VERSION=$(rbenv install -list | grep -Po '^\s*2.+' | tail -1)
   RUBY_CONFIGURE_OPTS=--with-readline-dir="/lib/x86_64-linux-gnu/libreadline.so.6" rbenv install $RUBY_VERSION
 fi
 
 
-if [[ " ${args[*]} " == *" --ruby "* ]] || \
-   [[ " ${args[*]} " == *" --alt-ruby "* ]]; then
+if [[ " ${args[*]} " == *" --ruby-install "* ]] || \
+   [[ " ${args[*]} " == *" --alt-ruby-install "* ]]; then
   # then
   rbenv global $RUBY_VERSION
   rbenv rehash
