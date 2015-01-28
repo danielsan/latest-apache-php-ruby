@@ -136,3 +136,61 @@ if [[ " ${args[*]} " == *" --apache--install "* ]]; then
   fi
 fi
 
+
+export PHP_HASHES_MATCH=1
+if [[ " ${args[*]} " == *" --php-download "* ]]; then
+  PHP_DOWNLOAD_DIR=~/Downloads/Xphp
+  mkdir $PHP_DOWNLOAD_DIR -p
+  echo "Entering dir $PHP_DOWNLOAD_DIR"
+  cd $PHP_DOWNLOAD_DIR
+
+  PHP_DOWNLOAD_PAGE_FILE=./php_download_page.html
+  curl -s http://php.net/downloads.php > $PHP_DOWNLOAD_PAGE_FILE
+  PHP_URL='http://us1.php.net'$(grep -Po '"[^"]+.bz2/from/a/mirror"' $PHP_DOWNLOAD_PAGE_FILE | head -1 | grep -Po '[^"]+'| sed 's~/a/~/this/~' )
+  PHP_FILE=$(echo $PHP_URL | grep -Po 'php-[^\/]+')
+  PHP_UNPACK_DIR=$(echo $PHP_FILE | grep -Po 'php-\d\.\d\.\d+')
+  PHP_REMOTE_MD5=$(grep 'class="md5sum"' $PHP_DOWNLOAD_PAGE_FILE | head -1 | grep -Po '\w{32}')
+
+  DOWNLOAD=true
+  if [ -f $PHP_FILE ]; then
+    echo "$PHP_FILE already exists"
+    echo "Checking MD5 hashes"
+    PHP_LOCAL_MD5=$(md5sum $PHP_FILE | grep -Po '\w{32}')
+    if [ $PHP_REMOTE_MD5 == $PHP_LOCAL_MD5 ]; then
+      echo "Hashes match, not downloading again"
+      DOWNLOAD=false
+    else
+      echo "Hashes don't match, removing ${PHP_FILE}"
+      cmd="rm -f ${PHP_FILE}"
+      echo $cmd;$cmd
+    fi
+  fi;
+
+  if [ $DOWNLOAD == true  ]; then
+    echo "Downloading $PHP_URL to $PHP_FILE"
+    echo "wget $PHP_URL -O $PHP_FILE"
+    wget $PHP_URL -O $PHP_FILE
+  fi
+  echo "Checking MD5 hashes"
+  PHP_LOCAL_MD5=$(md5sum $PHP_FILE | grep -Po '\w{32}')
+  echo "PHP_LOCAL_MD5=${PHP_LOCAL_MD5}"
+  echo "PHP_REMOTE_MD5=${PHP_REMOTE_MD5}"
+
+  if [ $PHP_REMOTE_MD5 == $PHP_LOCAL_MD5 ]; then
+    echo "Hashes match"
+    echo
+    echo "Extracting $PHP_FILE ..."
+    tar -xf $PHP_FILE
+
+    echo "Entering $PHP_UNPACK_DIR"
+    echo "cd $PHP_UNPACK_DIR"
+    cd $PHP_UNPACK_DIR
+
+    echo "=== READY TO INSTALL ==="
+  else
+    echo "Hashes don't match"
+    export PHP_HASHES_MATCH=0
+  fi
+fi
+
+
