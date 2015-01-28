@@ -328,3 +328,10 @@ if [[ " ${args[*]} " == *" --mongodb "* ]]; then
   sudo apt-get update
   sudo apt-get install -y mongodb-org
 fi
+
+
+if [[ " ${args[*]} " == *" --redis "* ]]; then
+  # Redis last version
+  sudo aptitude install -y redis-server
+fi
+
