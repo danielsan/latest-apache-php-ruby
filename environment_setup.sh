@@ -194,3 +194,77 @@ if [[ " ${args[*]} " == *" --php-download "* ]]; then
 fi
 
 
+if [[ " ${args[*]} " == *" --php-install "* ]] && [ $PHP_HASHES_MATCH == 1 ]; then
+  # Finding out PHP_VERSION
+  export PHP_VERSION=$(grep 'PHP_VERSION ' ./main/php_version.h | grep -Po "([\d\.]+)")
+  echo PHP_VERSION=$PHP_VERSION
+  export PHP_RELEASE=$(grep 'PHP_VERSION ' ./main/php_version.h | grep -Po "\d+\.\d+")
+  echo PHP_RELEASE=$PHP_RELEASE
+  export PHP_INSTALL_DIR=/opt/php-${PHP_VERSION}/
+  echo PHP_INSTALL_DIR=$PHP_INSTALL_DIR
+  export PHP_RELEASE_DIR=/opt/php-${PHP_RELEASE}/
+  echo PHP_RELEASE_DIR=$PHP_RELEASE_DIR
+exit
+  # After download and decompress the php 5.6.(last version) run this configure
+  ./configure --prefix=${PHP_INSTALL_DIR} \
+  --with-openssl \
+  --with-apxs2=/opt/apache-2.4/bin/apxs \
+  --enable-debug \
+  --enable-libgcc \
+  --with-libxml-dir \
+  --with-pcre-regex \
+  --with-zlib \
+  --enable-calendar \
+  --with-curl \
+  --enable-ftp \
+  --enable-gd-native-ttf \
+  --enable-intl \
+  --enable-mbstring \
+  --with-mysql \
+  --with-mysqli \
+  --enable-embedded-mysqli \
+  --enable-opcache \
+  --with-pdo-mysql \
+  --enable-soap \
+  --enable-sockets \
+  --enable-zip \
+  --with-readline \
+  --with-gd \
+  --with-mcrypt \
+  --enable-pcntl \
+  --enable-bcmath \
+  --with-pear && \
+  make && \
+  sudo make install || exit
+
+  sudo rm -f /opt/php-5.6
+  sudo ln -s $PHP_INSTALL_DIR /opt/php-5.6
+  # copy php.ini to php directory
+  sudo cp ./php.ini-production /opt/php-5.6/lib/php.ini
+  sudo sed -i 's~;date.timezone *= *$~date.timezone = America/New_York~' /opt/php-5.6/lib/php.ini
+
+  # Configure apache to work with PHP
+  # LoadModule php5_module        modules/libphp5.so
+  sudo sed -i 's~#LoadModule php5_module ~LoadModule php5_module ~' /opt/apache-2.4/conf/apache.conf
+
+  echo '
+  # Add the following line
+  AddHandler php5-script php
+
+  # At the Include section add this line
+  Include conf/extra/vhosts/*.conf
+  ' | sudo tee -a /opt/apache-2.4/conf/apache.conf
+
+  # sudo vim /etc/environment
+  # add the following paths to the end of the content of the PATH variable ("inside the quotes")
+  if ! grep -q '/opt/php-5.6/bin' /etc/environment; then
+    echo "adding '/opt/php-5.6/bin' to the PATH variable in /etc/environment"
+    sudo sed -i 's~"$~:/opt/php-5.6/bin"~' /etc/environment
+    source /etc/environment
+  fi
+  if ! grep -q '/opt/php-5.6/bin' /etc/sudoers; then
+    echo "adding '/opt/php-5.6/bin' to the PATH variable in /etc/sudoers"
+    sudo sed -i 's~"$~:/opt/php-5.6/bin"~' /etc/sudoers
+  fi
+fi
+
