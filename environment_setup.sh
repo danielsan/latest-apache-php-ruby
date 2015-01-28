@@ -294,3 +294,14 @@ if [[ " ${args[*]} " == *" --php-install "* ]]      || \
   extension=mongo.so
   ' | sudo tee -a /opt/php-5.6/lib/php.ini
 fi
+
+if [[ " ${args[*]} " == *" --php-install "* ]]      || \
+   [[ " ${args[*]} " == *" --php-libs "* ]] || \
+   [[ " ${args[*]} " == *" --php-redis "* ]]; then
+
+  sudo /opt/php-5.6/bin/pecl install Redis
+  echo '[redis]
+  extension=redis.so
+  ' | sudo tee -a /opt/php-5.6/lib/php.ini
+fi
+
