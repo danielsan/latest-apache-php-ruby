@@ -284,3 +284,13 @@ if [[ " ${args[*]} " == *" --php-install "* ]]      || \
   memcache.maxratio=0
   ' | sudo tee -a /opt/php-5.6/lib/php.ini
 fi
+
+if [[ " ${args[*]} " == *" --php-install "* ]]      || \
+   [[ " ${args[*]} " == *" --php-libs "* ]] || \
+   [[ " ${args[*]} " == *" --php-mongo "* ]]; then
+
+  sudo /opt/php-5.6/bin/pecl install Mongo
+  echo '[mongo]
+  extension=mongo.so
+  ' | sudo tee -a /opt/php-5.6/lib/php.ini
+fi
