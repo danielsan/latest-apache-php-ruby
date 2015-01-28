@@ -339,3 +339,47 @@ if [[ " ${args[*]} " == *" --memcache "* ]] || [[ " ${args[*]} " == *" --memcach
   # Redis last version
   sudo aptitude install -y memcached
 fi
+
+if [[ " ${args[*]} " == *" --rbenv "* ]]; then
+  #### RUBY environment
+  # https://github.com/sstephenson/rbenv#basic-github-checkout
+  git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+  echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc  #or .bash_profile
+  echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+  source ~/.bashrc
+
+  # https://github.com/sstephenson/ruby-build#readme
+  git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+  rbenv rehash
+fi
+
+
+if [[ " ${args[*]} " == *" --ruby "* ]]; then
+  #try
+  export RUBY_VERSION=$(rbenv install -list | grep -Po '^\s*2.+' | tail -1)
+  rbenv install $RUBY_VERSION
+fi
+
+# if you have some error messages related to ripper like these messages:
+#   linking shared-object ripper.so
+#   make[2]: Leaving directory `/tmp/ruby-build.20140505165022.26735/ruby-2.2.0.preview2/ext/ripper'
+#   make[1]: Leaving directory `/tmp/ruby-build.20140505165022.26735/ruby-2.2.0.preview2'
+#   make: *** [build-ext] Error 2
+#
+# Try this out:
+if [[ " ${args[*]} " == *" --alt-ruby "* ]]; then
+  export RUBY_VERSION=$(rbenv install -list | grep -Po '^\s*2.+' | tail -1)
+  RUBY_CONFIGURE_OPTS=--with-readline-dir="/lib/x86_64-linux-gnu/libreadline.so.6" rbenv install $RUBY_VERSION
+fi
+
+
+if [[ " ${args[*]} " == *" --ruby "* ]] || \
+   [[ " ${args[*]} " == *" --alt-ruby "* ]]; then
+  # then
+  rbenv global $RUBY_VERSION
+  rbenv rehash
+  gem install bundler
+  gem install capistrano
+  rbenv rehash
+fi
