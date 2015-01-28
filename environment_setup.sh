@@ -305,3 +305,19 @@ if [[ " ${args[*]} " == *" --php-install "* ]]      || \
   ' | sudo tee -a /opt/php-5.6/lib/php.ini
 fi
 
+
+if [[ " ${args[*]} " == *" --php-install "* ]]      || \
+   [[ " ${args[*]} " == *" --php-libs "* ]] || \
+   [[ " ${args[*]} " == *" --php-composer "* ]]; then
+
+  #curl -sS https://getcomposer.org/installer | php
+  /opt/php-5.6/bin/php -r "readfile('https://getcomposer.org/installer');" | /opt/php-5.6/bin/php
+  sudo mv composer.phar /usr/local/bin/
+
+  echo '#!/bin/bash
+  php -d memory_limit=-1 /usr/local/bin/composer.phar $@
+  ' | sudo tee /usr/local/bin/composer
+  sudo chmod 755 /usr/local/bin/composer
+fi
+
+
