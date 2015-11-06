@@ -3,8 +3,8 @@ args=$@
 
 if [[ " ${args[*]} " == *" --libs "* ]] ||
    [[ " ${args[*]} " == *" all "* ]]    ||
-   [[ " ${args[*]} " == *" --php--install "* ]] ||
-   [[ " ${args[*]} " == *" --apache--install "* ]]; then
+   [[ " ${args[*]} " == *" --php-install "* ]] ||
+   [[ " ${args[*]} " == *" --apache-install "* ]]; then
   # required librearies for installing apache and php5
   sudo aptitude install -y \
    build-essential \
@@ -82,10 +82,14 @@ if [[ " ${args[*]} " == *" --apache-download "* ]]; then
 fi
 
 
-if [[ " ${args[*]} " == *" --apache--install "* ]]; then
+if [[ " ${args[*]} " == *" --apache-install "* ]]; then
+#  export APACHE_DOWNLOAD_DIR=~/Downloads/Xapache
+#  echo "APACHE_DOWNLOAD_DIR = $APACHE_DOWNLOAD_DIR"
+#  cd $APACHE_DOWNLOAD_DIR #|| echo "exiting..." && exit
   export APACHE_VERSION=$(grep Version: httpd.spec | grep -Po '\d+\.\d+\.\d+')
   export APACHE_RELEASE=$(grep Version: httpd.spec | grep -Po '\d+\.\d+')
 
+echo "APACHE_VERSION=$APACHE_VERSION | APACHE_RELEASE=$APACHE_RELEASE"
   export APACHE_INSTALL_DIR=/opt/apache-${APACHE_VERSION}/
   export APACHE_RELEASE_DIR=/opt/apache-${APACHE_RELEASE}/
 
@@ -205,7 +209,7 @@ if [[ " ${args[*]} " == *" --php-install "* ]] && [ $PHP_HASHES_MATCH == 1 ]; th
   echo PHP_INSTALL_DIR=$PHP_INSTALL_DIR
   export PHP_RELEASE_DIR=/opt/php-${PHP_RELEASE}/
   echo PHP_RELEASE_DIR=$PHP_RELEASE_DIR
-exit
+#exit
   # After download and decompress the php 5.6.(last version) run this configure
   ./configure --prefix=${PHP_INSTALL_DIR} \
   --with-openssl \
