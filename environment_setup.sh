@@ -91,7 +91,7 @@ if [[ " ${args[*]} " == *" --apache-install "* ]]; then
 
 echo "APACHE_VERSION=$APACHE_VERSION | APACHE_RELEASE=$APACHE_RELEASE"
   export APACHE_INSTALL_DIR=/opt/apache-${APACHE_VERSION}/
-  export APACHE_RELEASE_DIR=/opt/apache-${APACHE_RELEASE}/
+  export APACHE_RELEASE_DIR=/opt/apache-${APACHE_RELEASE}
 
   # After download and decompress the apache 2.4.(last version) run this configure
   ./configure --prefix=${APACHE_INSTALL_DIR} \
@@ -118,26 +118,26 @@ echo "APACHE_VERSION=$APACHE_VERSION | APACHE_RELEASE=$APACHE_RELEASE"
 
   # edit /opt/apache-2.4/conf/apache.conf
   #LoadModule slotmem_shm_module modules/mod_slotmem_shm.so
-  sudo sed -i 's~#LoadModule slotmem_shm_module ~LoadModule slotmem_shm_module ~' /opt/apache-2.4/conf/apache.conf
+  sudo sed -i 's~#LoadModule slotmem_shm_module ~LoadModule slotmem_shm_module ~' $APACHE_RELEASE_DIR/conf/apache.conf
 
   #LoadModule rewrite_module modules/mod_rewrite.so
-  sudo sed -i 's~#LoadModule rewrite_module ~LoadModule rewrite_module ~' /opt/apache-2.4/conf/apache.conf
+  sudo sed -i 's~#LoadModule rewrite_module ~LoadModule rewrite_module ~' $APACHE_RELEASE_DIR/conf/apache.conf
 
-  sudo mkdir -p /opt/apache-2.4/conf/extra/vhosts/
+  sudo mkdir -p $APACHE_RELEASE_DIR/conf/extra/vhosts/
 
   # sudo vim /etc/environment
   # add the following paths to the end of the content of the PATH variable ("inside the quotes")
-  if ! grep -q '/opt/apache-2.4/bin' /etc/environment; then
-    echo "adding '/opt/apache-2.4/bin' to the PATH variable in /etc/environment"
-    sudo sed -i 's~"$~:/opt/apache-2.4/bin"~' /etc/environment
+  if ! grep -q "${APACHE_RELEASE_DIR}/bin" /etc/environment; then
+    echo "adding '${APACHE_RELEASE_DIR}/bin' to the PATH variable in /etc/environment"
+    sudo sed -i 's~"$~:'${APACHE_RELEASE_DIR}'/bin"~' /etc/environment
     source /etc/environment
   fi
 
   # sudo vim /etc/sudoers
   # add the following paths to the end of the content of secure_path=
-  if ! grep -q '/opt/apache-2.4/bin' /etc/sudoers; then
-    echo "adding '/opt/apache-2.4/bin' to the PATH variable in /etc/sudoers"
-    sudo sed -i 's~"$~:/opt/apache-2.4/bin"~' /etc/sudoers
+  if ! grep -q "${APACHE_RELEASE_DIR}/bin" /etc/sudoers; then
+    echo "adding '${APACHE_RELEASE_DIR}/bin' to the PATH variable in /etc/sudoers"
+    sudo sed -i 's~"$~:'${APACHE_RELEASE_DIR}'/bin"~' /etc/sudoers
   fi
 fi
 
